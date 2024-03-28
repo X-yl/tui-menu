@@ -1,8 +1,8 @@
 use std::{borrow::Cow, marker::PhantomData};
-use tui::{
+use ratatui::{
     layout::Rect,
     style::{Color, Style},
-    text::{Span, Spans},
+    text::{Line, Span},
     widgets::{Clear, StatefulWidget, Widget},
 };
 
@@ -27,7 +27,7 @@ impl<T: Clone> MenuState<T> {
     /// # Example
     ///
     /// ```
-    /// use tui_menu::{MenuState, MenuItem};
+    /// use ratatui_menu::{MenuState, MenuItem};
     ///
     /// let state = MenuState::<&'static str>::new(vec![
     ///     MenuItem::item("Foo", "label_foo"),
@@ -56,7 +56,7 @@ impl<T: Clone> MenuState<T> {
     /// # Example
     ///
     /// ```
-    /// use tui_menu::{MenuState, MenuItem};
+    /// use ratatui_menu::{MenuState, MenuItem};
     ///
     /// let mut state = MenuState::<&'static str>::new(vec![
     ///     MenuItem::item("Foo", "label_foo"),
@@ -77,7 +77,7 @@ impl<T: Clone> MenuState<T> {
     }
 
     /// trigger up movement
-    /// NOTE: this action tries to do intuitive movement,
+    /// NOTE: this action tries to do inratatuitive movement,
     /// which means logicially it is not consistent, e.g:
     /// case 1:
     ///    group 1        group 2        group 3
@@ -125,7 +125,7 @@ impl<T: Clone> MenuState<T> {
 
     /// trigger down movement
     ///
-    /// NOTE: this action tries to do intuitive movement,
+    /// NOTE: this action tries to do inratatuitive movement,
     /// which means logicially it is not consistent, e.g:
     /// case 1:
     ///    group 1      > group 2        group 3
@@ -155,7 +155,7 @@ impl<T: Clone> MenuState<T> {
 
     /// trigger left movement
     ///
-    /// NOTE: this action tries to do intuitive movement,
+    /// NOTE: this action tries to do inratatuitive movement,
     /// which means logicially it is not consistent, e.g:
     /// case 1:
     ///    group 1      > group 2        group 3
@@ -188,7 +188,7 @@ impl<T: Clone> MenuState<T> {
 
     /// trigger right movement
     ///
-    /// NOTE: this action tries to do intuitive movement,
+    /// NOTE: this action tries to do inratatuitive movement,
     /// which means logicially it is not consistent, e.g:
     /// case 1:
     ///    group 1      > group 2        group 3
@@ -330,7 +330,7 @@ impl<T> MenuItem<T> {
     /// # Example
     ///
     /// ```
-    /// use tui_menu::MenuItem;
+    /// use ratatui_menu::MenuItem;
     ///
     /// let item = MenuItem::<&'static str>::group("group", vec![
     ///     MenuItem::item("foo", "label_foo"),
@@ -532,7 +532,7 @@ impl<T> Menu<T> {
         x: u16,
         y: u16,
         group: &[MenuItem<T>],
-        buf: &mut tui::buffer::Buffer,
+        buf: &mut ratatui::buffer::Buffer,
         depth: usize,
     ) {
         let area = Rect::new(x, y, self.drop_down_width, group.len() as u16);
@@ -574,9 +574,9 @@ impl<T> Menu<T> {
 impl<T> StatefulWidget for Menu<T> {
     type State = MenuState<T>;
 
-    fn render(self, area: Rect, buf: &mut tui::buffer::Buffer, state: &mut Self::State) {
+    fn render(self, area: Rect, buf: &mut ratatui::buffer::Buffer, state: &mut Self::State) {
         let mut spans = vec![];
-        let mut x_pos = 0;
+        let mut x_pos = area.x as usize;
         let y_pos = area.y;
 
         for (idx, item) in state.root_item.children.iter().enumerate() {
@@ -603,6 +603,6 @@ impl<T> StatefulWidget for Menu<T> {
                 spans.push(span);
             }
         }
-        buf.set_spans(area.x, area.y, &Spans::from(spans), x_pos as u16);
+            buf.set_line(area.x, area.y, &Line::default().spans(spans), x_pos as u16);
     }
 }
